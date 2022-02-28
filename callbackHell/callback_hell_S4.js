@@ -11,12 +11,17 @@
 //Solución 5: Native Support for Promises in Node.js for File System module
 
 // => IMPLEMENTACIÓN SOLUCIÓN 4: async / await
+//readdir, readFile, writeFile son métodos ASÍNCRONOS del módulo File System.
+//Los métodos síncronos serían readdirSync, readFileSync, writeFileSync...
+//Como estos métodos asíncronos, la función wrapper devuelve el resultado antes de que finalice su ejecucción.
+//Por ello, no vale de nada envolver estos métodos directamente en una función wrapper. 
+//
 
-const { captureRejections } = require("events");
 const {
   readdir,
   readFile,
-  writeFile
+  writeFile,
+  promises,
 } = require("fs");
 
 
@@ -28,36 +33,57 @@ const outbox = join(__dirname, "outbox");
 
 const reverseText = str => str.split("").reverse().join("");
 
-async function leerDirectorio(inbox) {
-  var cosas = await readdir(inbox, (error, files) => {
-      if (error) return(new Error("Error: Folder inaccessible"));
-    });
-    return cosas
+
+const wrapperFunction = async () => {
+  try {
+    const files = await promises.readdir(inbox); 
+      for(let i = 0; i < files.length; i++) {
+        let data = await promises.readFile(join(inbox,files[i]),"utf8");
+        await promises.writeFile(join(outbox, files[i]), reverseText(data));
+        console.log(`${files[i]} was successfully saved in the outbox!`);
+      }
+  }
+  catch (err) {
+    console.log(err);
+  }
 }
 
-async function leerArchivo(file) {
+wrapperFunction();
+
+
+//Esto no funcionaría debido a la asincronía de los métodos de FileSystem
+
+/* async function leerDirectorio(inbox) {
+  let solution = "";
+  readdir(inbox, (error, files) => {
+      if (error) return(new Error("Error: Folder inaccessible"));
+      solution = files; 
+    });
+    return solution
+} */
+
+/* async function leerArchivo(file) {
+  let jitu = "pepito";
     readFile(join(inbox, file), "utf8", (error, data) => {
       if (error) return (console.log("Error: File error"));
-      return data
+      jitu = "data";
+      console.log("DATA:"+data)
     });
-}
+    return jitu;//data
+} */
 
-async function escribirArchivo(file, data) {
+/* async function escribirArchivo(file, data) {
     writeFile(join(outbox, file), reverseText(data), error => {
       if (error) return (new Error("Error: File could not be saved!"));
       console.log(`${file} was successfully saved in the outbox!`);
     })
 
-}
+} */
 
-async function resultadoFinal() {
+/* async function resultadoFinal() {
   const files = await leerDirectorio(inbox);
   files.forEach(async file => {
     let data = await leerArchivo(file);
     await escribirArchivo(file, data);
   })
-}
-
-resultadoFinal();
-//leerDirectorio(inbox)
-
+} */
