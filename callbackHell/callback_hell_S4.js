@@ -11,11 +11,10 @@
 //Solución 5: Native Support for Promises in Node.js for File System module
 
 // => IMPLEMENTACIÓN SOLUCIÓN 4: async / await
-//readdir, readFile, writeFile son métodos ASÍNCRONOS del módulo File System.
-//Los métodos síncronos serían readdirSync, readFileSync, writeFileSync...
-//Como estos métodos asíncronos, la función wrapper devuelve el resultado antes de que finalice su ejecucción.
-//Por ello, no vale de nada envolver estos métodos directamente en una función wrapper. 
-//
+//readdir, readFile, writeFile son métodos ASÍNCRONOS del módulo File System (Los métodos síncronos serían readdirSync, readFileSync, writeFileSync)
+//Como estos métodos son asíncronos, la función wrapper devuelve el resultado antes de que finalice su ejecucción.
+//Por ello, no vale de nada envolver estos métodos directamente en una función wrapper (ver comentarios al final)
+//Para usar async await, promisificamos
 
 const {
   readdir,
